@@ -5,6 +5,11 @@ import boardexample.myboard.domain.user.User;
 import boardexample.myboard.web.session.SessionConst;
 import boardexample.myboard.web.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.Banner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -35,12 +40,26 @@ public class PostController {
         return "redirect:/";
     }
 
-    @GetMapping("/list")
+    //@GetMapping("/list")
     public String postList(Model model){
         List<Post> allPosts = postService.findAllPosts();
         model.addAttribute("posts", allPosts);
         return "post/postList";
     }
+
+    @GetMapping("/list")
+    public String postPaging(@PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable, Model model){
+        Page<Post> posts = postService.postList(pageable);
+        int nowPage = posts.getPageable().getPageNumber() + 1;
+        int startPage = Math.max(nowPage -4 , 1);
+        int endPage = Math.min(nowPage + 5, posts.getTotalPages());
+        model.addAttribute("posts", posts);
+        model.addAttribute("nowPage", nowPage);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        return "post/postList";
+    }
+
 
     @GetMapping("/{postId}")
     public String postView(@PathVariable("postId") Long postId, Model model){
@@ -51,6 +70,7 @@ public class PostController {
 
         return "post/postView";
     }
+
 
     @GetMapping("/{postId}/delete")
     public String postDelete(@PathVariable("postId") Long postId){

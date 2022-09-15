@@ -5,6 +5,9 @@ import boardexample.myboard.domain.post.PostRepository;
 import boardexample.myboard.domain.user.User;
 import boardexample.myboard.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +51,11 @@ public class PostService {
         return postRepository.findAll();
     }
 
+    public Page<Post> postList(Pageable pageable){
+        return postRepository.findAll(pageable);
+    }
+
+
     @Transactional
     public void delete(Long postId){
         Post post = findPost(postId);
@@ -60,8 +68,8 @@ public class PostService {
         return postRepository.findOnePostDto(postId);
     }
 
-    public List<PostResponseDto> allPostDto(){
-        return postRepository.findAllPostDto();
+    public Page<PostResponseDto> allPostDto(Pageable pageable){
+        return postRepository.findAllPostDto(pageable);
     }
 
     //
